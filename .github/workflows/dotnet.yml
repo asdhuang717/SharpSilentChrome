@@ -26,22 +26,13 @@ jobs:
       uses: microsoft/setup-msbuild@v1
 
     - name: Build Solution
-      run: msbuild SharpSilentChrome.sln /p:Configuration=Release /p:Platform="Any CPU"
-
-    # 👇 调试：查看 bin 目录下到底有什么
-    - name: List All Files in bin
       run: |
-        if exist SharpSilentChrome\bin (
-          dir SharpSilentChrome\bin /S /B
-        ) else (
-          echo "Directory SharpSilentChrome\bin does not exist!"
-        )
+        msbuild SharpSilentChrome.sln /p:Configuration=Release /p:Platform="Any CPU" /p:OutputPath="bin/Release"
 
-    # 👇 上传产物（稍后修改路径）
-    - name: Upload Artifact
+    - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: SharpSilentChrome-Build-Output
+        name: SharpSilentChrome-Release-Build
         path: |
-          SharpSilentChrome/bin/
+          SharpSilentChrome/bin/Release/SharpSilentChrome.exe
         retention-days: 7

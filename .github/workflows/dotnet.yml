@@ -11,7 +11,7 @@ build:
 runs-on: windows-latest
 
 steps:
-- name: Checkout source code
+- name: Checkout repository
 uses: actions/checkout@v4
 
 - name: Setup NuGet
@@ -19,20 +19,19 @@ uses: nuget/setup-nuget@v1
 with:
 nuget-version: 'latest'
 
-- name: Restore NuGet Packages
+- name: Restore NuGet packages
 run: nuget restore SharpSilentChrome.sln
 
 - name: Setup MSBuild
 uses: microsoft/setup-msbuild@v1
 
-- name: Build Solution
-run: |
-msbuild SharpSilentChrome.sln /p:Configuration=Release /p:Platform="Any CPU" /verbosity:minimal
+- name: Build with MSBuild
+run: msbuild SharpSilentChrome.sln /p:Configuration=Release /p:Platform="Any CPU"
 
 - name: Upload Build Artifacts
 uses: actions/upload-artifact@v4
 with:
-name: SharpSilentChrome-Release-Build
+name: SharpSilentChrome-Release
 path: |
 **/bin/Release/*.exe
 retention-days: 7

@@ -1,13 +1,13 @@
-name: Build and Release
+name: Build .NET Framework
 
 on:
   push:
-    # 触发条件：推送 tag，例如 v1.0、v1.2.3
-    tags:
-      - 'v*'  # 匹配 v1.0, v2.1.0 等
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 
 jobs:
-  build-and-release:
+  build:
     runs-on: windows-latest
 
     steps:
@@ -26,42 +26,22 @@ jobs:
       uses: microsoft/setup-msbuild@v1
 
     - name: Build Solution
-      run: |
-        msbuild SharpSilentChrome.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild
+      run: msbuild SharpSilentChrome.sln /p:Configuration=Release /p:Platform="Any CPU"
 
-    - name: Find Output File
+    # 👇 调试：查看 bin 目录下到底有什么
+    - name: List All Files in bin
       run: |
-        dir SharpSilentChrome\bin\Release\*.exe /B
-        echo "EXE_NAME=$(dir SharpSilentChrome\bin\Release\*.exe /B)" >> $env:GITHUB_ENV
+        if exist SharpSilentChrome\bin (
+          dir SharpSilentChrome\bin /S /B
+        ) else (
+          echo "Directory SharpSilentChrome\bin does not exist!"
+        )
 
-    # 👇 上传构建产物（可选：用于调试）
+    # 👇 上传产物（稍后修改路径）
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: SharpSilentChrome-Build
-        path: SharpSilentChrome/bin/Release/
-
-    # 👇 创建 Release 并上传 .exe
-    - name: Create Release
-      id: create_release
-      uses: softprops/action-gh-release@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        name: Release ${{ github.ref }}
-        body: |
-          Automated release from GitHub Actions.
-          Built from commit: `${{ github.sha }}`
-        draft: false
-        prerelease: false
-
-    - name: Upload .exe to Release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: SharpSilentChrome/bin/Release/SharpSilentChrome.exe
-        asset_name: SharpSilentChrome.exe
-        asset_content_type: application/x-msdownload
+        name: SharpSilentChrome-Build-Output
+        path: |
+          SharpSilentChrome/bin/
+        retention-days: 7

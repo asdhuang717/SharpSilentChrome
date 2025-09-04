@@ -20,21 +20,19 @@ jobs:
         nuget-version: 'latest'
 
     - name: Restore NuGet Packages
-      run: nuget restore SharpSilentChrome.sln
+      run: nuget restore SharpSilentChrome.sln   # ← 这里写真实文件名
 
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1
 
     - name: Build Solution
-      run: |
-        msbuild SharpSilentChrome.sln /p:Configuration=Release /p:Platform="Any CPU" /p:OutputPath="bin/Release"
+      run: msbuild SharpSilentChrome.sln /p:Configuration=Release /p:Platform="Any CPU"
 
-    - name: Upload Build Artifacts
+    - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: SharpSilentChrome-Release-Build
+        name: SharpSilentChrome-Release
         path: |
           SharpSilentChrome/bin/Release/*.exe
           SharpSilentChrome/bin/Release/*.dll
           SharpSilentChrome/bin/Release/*.config
-        retention-days: 7

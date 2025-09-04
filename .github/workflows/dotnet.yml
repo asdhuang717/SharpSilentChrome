@@ -11,7 +11,8 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
     - name: Setup NuGet
       uses: nuget/setup-nuget@v1
@@ -25,15 +26,15 @@ jobs:
       uses: microsoft/setup-msbuild@v1
 
     - name: Build Solution
-      run: msbuild SharpSilentChrome.sln /p:Configuration=Release /p:Platform="Any CPU"
+      run: |
+        msbuild SharpSilentChrome.sln /p:Configuration=Release /p:Platform="Any CPU" /p:OutputPath="bin/Release"
 
-    # 👇 新增：上传构建产物（artifacts）
-    - name: Upload Artifact
+    - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: Release-build-output
+        name: SharpSilentChrome-Release-Build
         path: |
-          **/bin/Release/*.exe
-          **/bin/Release/*.dll
-          !**/obj/**
+          SharpSilentChrome/bin/Release/*.exe
+          SharpSilentChrome/bin/Release/*.dll
+          SharpSilentChrome/bin/Release/*.config
         retention-days: 7

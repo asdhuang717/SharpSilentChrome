@@ -13,17 +13,27 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # 安装 nuget.exe 并添加到 PATH
     - name: Setup NuGet
       uses: nuget/setup-nuget@v1
       with:
         nuget-version: 'latest'
 
-    - name: Restore NuGet packages
+    - name: Restore NuGet Packages
       run: nuget restore SharpSilentChrome.sln
 
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1
 
-    - name: Build
+    - name: Build Solution
       run: msbuild SharpSilentChrome.sln /p:Configuration=Release /p:Platform="Any CPU"
+
+    # 👇 新增：上传构建产物（artifacts）
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Release-build-output
+        path: |
+          **/bin/Release/*.exe
+          **/bin/Release/*.dll
+          !**/obj/**
+        retention-days: 7

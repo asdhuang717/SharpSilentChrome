@@ -1,37 +1,39 @@
 name: Build .NET Framework
 
 on:
-push:
-branches: [ "master" ]
-pull_request:
-branches: [ "master" ]
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 
 jobs:
-build:
-runs-on: windows-latest
+  build:
+    runs-on: windows-latest
 
-steps:
-- name: Checkout repository
-uses: actions/checkout@v4
+    steps:
+    - uses: actions/checkout@v4
 
-- name: Setup NuGet
-uses: nuget/setup-nuget@v1
-with:
-nuget-version: 'latest'
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v1
+      with:
+        nuget-version: 'latest'
 
-- name: Restore NuGet packages
-run: nuget restore SharpSilentChrome.sln
+    - name: Restore NuGet Packages
+      run: nuget restore SharpSilentChrome.sln
 
-- name: Setup MSBuild
-uses: microsoft/setup-msbuild@v1
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
 
-- name: Build with MSBuild
-run: msbuild SharpSilentChrome.sln /p:Configuration=Release /p:Platform="Any CPU"
+    - name: Build Solution
+      run: msbuild SharpSilentChrome.sln /p:Configuration=Release /p:Platform="Any CPU"
 
-- name: Upload Build Artifacts
-uses: actions/upload-artifact@v4
-with:
-name: SharpSilentChrome-Release
-path: |
-**/bin/Release/*.exe
-retention-days: 7
+    # 👇 新增：上传构建产物（artifacts）
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Release-build-output
+        path: |
+          **/bin/Release/*.exe
+          **/bin/Release/*.dll
+          !**/obj/**
+        retention-days: 7
